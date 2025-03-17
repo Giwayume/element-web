@@ -480,6 +480,7 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
         }
 
         window.addEventListener("resize", this.onWindowResized);
+        document.body.classList.remove("mx_loading");
     }
 
     public componentDidUpdate(prevProps: IProps, prevState: IState): void {

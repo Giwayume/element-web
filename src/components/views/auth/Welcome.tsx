@@ -18,6 +18,11 @@ import EmbeddedPage from "../../structures/EmbeddedPage";
 import { MATRIX_LOGO_HTML } from "../../structures/static-page-vars";
 
 export default class Welcome extends React.PureComponent<EmptyObject> {
+    
+    componentDidMount() {
+        document.body.classList.remove("mx_loading");
+    }
+
     public render(): React.ReactNode {
         const pagesConfig = SdkConfig.getObject("embedded_pages");
         let pageUrl: string | undefined;

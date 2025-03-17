@@ -15,12 +15,16 @@ import AuthFooter from "./AuthFooter";
 export default class AuthPage extends React.PureComponent<React.PropsWithChildren> {
     private static welcomeBackgroundUrl?: string;
 
+    componentDidMount() {
+        document.body.classList.remove("mx_loading");
+    }
+
     // cache the url as a static to prevent it changing without refreshing
     private static getWelcomeBackgroundUrl(): string {
         if (AuthPage.welcomeBackgroundUrl) return AuthPage.welcomeBackgroundUrl;
 
         const brandingConfig = SdkConfig.getObject("branding");
-        AuthPage.welcomeBackgroundUrl = "themes/element/img/backgrounds/lake.jpg";
+        AuthPage.welcomeBackgroundUrl = "";
 
         const configuredUrl = brandingConfig?.get("welcome_background_url");
         if (configuredUrl) {
@@ -58,7 +62,7 @@ export default class AuthPage extends React.PureComponent<React.PropsWithChildre
         const modalContentStyle: React.CSSProperties = {
             display: "flex",
             zIndex: 1,
-            background: "rgba(255, 255, 255, 0.59)",
+            background: "#14191f",
             borderRadius: "8px",
         };
 
