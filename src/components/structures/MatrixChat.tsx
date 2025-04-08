@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only OR GPL-3.0-only OR LicenseRef-Element-Com
 Please see LICENSE files in the repository root for full details.
 */
 
-import React, { createRef, lazy } from "react";
+import React, { type JSX, createRef, lazy } from "react";
 import {
     ClientEvent,
     createClient,
@@ -235,6 +235,7 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
     private themeWatcher?: ThemeWatcher;
     private fontWatcher?: FontWatcher;
     private readonly stores: SdkContextClass;
+    private loadSessionAbortController = new AbortController();
 
     public constructor(props: IProps) {
         super(props);
@@ -327,7 +328,7 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
             // When the session loads it'll be detected as soft logged out and a dispatch
             // will be sent out to say that, triggering this MatrixChat to show the soft
             // logout page.
-            Lifecycle.loadSession();
+            Lifecycle.loadSession({ abortSignal: this.loadSessionAbortController.signal });
             return;
         }
 
@@ -553,6 +554,7 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
                     guestHsUrl: this.getServerProperties().serverConfig.hsUrl,
                     guestIsUrl: this.getServerProperties().serverConfig.isUrl,
                     defaultDeviceDisplayName: this.props.defaultDeviceDisplayName,
+                    abortSignal: this.loadSessionAbortController.signal,
                 });
             })
             .then((loadedSession) => {
@@ -709,36 +711,6 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
                 break;
             case "copy_room":
                 this.copyRoom(payload.room_id);
-                break;
-            case "reject_invite":
-                Modal.createDialog(QuestionDialog, {
-                    title: _t("reject_invitation_dialog|title"),
-                    description: _t("reject_invitation_dialog|confirmation"),
-                    onFinished: (confirm) => {
-                        if (confirm) {
-                            // FIXME: controller shouldn't be loading a view :(
-                            const modal = Modal.createDialog(Spinner, undefined, "mx_Dialog_spinner");
-
-                            MatrixClientPeg.safeGet()
-                                .leave(payload.room_id)
-                                .then(
-                                    () => {
-                                        modal.close();
-                                        if (this.state.currentRoomId === payload.room_id) {
-                                            dis.dispatch({ action: Action.ViewHomePage });
-                                        }
-                                    },
-                                    (err) => {
-                                        modal.close();
-                                        Modal.createDialog(ErrorDialog, {
-                                            title: _t("reject_invitation_dialog|failed"),
-                                            description: err.toString(),
-                                        });
-                                    },
-                                );
-                        }
-                    },
-                });
                 break;
             case "view_user_info":
                 this.viewUser(payload.userId, payload.subAction);
@@ -1389,7 +1361,7 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
                 // so show the homepage.
                 dis.dispatch<ViewHomePagePayload>({ action: Action.ViewHomePage, justRegistered: true });
             }
-        } else {
+        } else if (!(await this.shouldForceVerification())) {
             this.showScreenAfterLogin();
         }
 
@@ -1566,25 +1538,32 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
             dis.fire(Action.FocusSendMessageComposer);
         });
 
-        cli.on(HttpApiEvent.SessionLoggedOut, function (errObj) {
+        cli.on(HttpApiEvent.SessionLoggedOut, (errObj) => {
+            this.loadSessionAbortController.abort(errObj);
+            this.loadSessionAbortController = new AbortController();
+
             if (Lifecycle.isLoggingOut()) return;
 
             // A modal might have been open when we were logged out by the server
             Modal.forceCloseAllModals();
 
-            if (errObj.httpStatus === 401 && errObj.data && errObj.data["soft_logout"]) {
+            if (errObj.httpStatus === 401 && errObj.data?.["soft_logout"]) {
                 logger.warn("Soft logout issued by server - avoiding data deletion");
                 Lifecycle.softLogout();
                 return;
             }
 
+            dis.dispatch(
+                {
+                    action: "logout",
+                },
+                true,
+            );
+
+            // The above dispatch closes all modals, so open the modal after calling it synchronously
             Modal.createDialog(ErrorDialog, {
                 title: _t("auth|session_logged_out_title"),
                 description: _t("auth|session_logged_out_description"),
-            });
-
-            dis.dispatch({
-                action: "logout",
             });
         });
         cli.on(HttpApiEvent.NoConsent, function (message, consentUri) {
@@ -2004,9 +1983,17 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
     };
 
     // complete security / e2e setup has finished
-    private onCompleteSecurityE2eSetupFinished = (): void => {
-        // This is async but we making this function async to wait for it isn't useful
-        this.onShowPostLoginScreen().catch((e) => {
+    private onCompleteSecurityE2eSetupFinished = async (): Promise<void> => {
+        const forceVerify = await this.shouldForceVerification();
+        if (forceVerify) {
+            const isVerified = await MatrixClientPeg.safeGet().getCrypto()?.isCrossSigningReady();
+            if (!isVerified) {
+                // We must verify but we haven't yet verified - don't continue logging in
+                return;
+            }
+        }
+
+        await this.onShowPostLoginScreen().catch((e) => {
             logger.error("Exception showing post-login screen", e);
         });
     };
