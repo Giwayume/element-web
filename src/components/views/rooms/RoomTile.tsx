@@ -411,7 +411,7 @@ class RoomTile extends React.PureComponent<Props, State> {
             mx_RoomTile_titleHasUnreadEvents: this.notificationState.isUnread,
         });
 
-        const titleContainer = this.props.isMinimized ? null : (
+        const titleContainer = (
             <div className="mx_RoomTile_titleContainer">
                 <div title={name} className={titleClasses} tabIndex={-1}>
                     <span dir="auto">{name}</span>

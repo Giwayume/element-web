@@ -493,13 +493,13 @@ export function init(setUpPersistence = true): Promise<void> {
     if (global.mx_rage_initPromise) {
         return global.mx_rage_initPromise;
     }
-    global.mx_rage_logger = new ConsoleLogger();
-    global.mx_rage_logger.monkeyPatch(window.console);
+    // global.mx_rage_logger = new ConsoleLogger();
+    // global.mx_rage_logger.monkeyPatch(window.console);
 
     // log unhandled rejections in the rageshake
-    window.addEventListener("unhandledrejection", (event) => {
-        global.mx_rage_logger.log("error", `Unhandled promise rejection: ${event.reason}`);
-    });
+    // window.addEventListener("unhandledrejection", (event) => {
+    //     global.mx_rage_logger.log("error", `Unhandled promise rejection: ${event.reason}`);
+    // });
 
     if (setUpPersistence) {
         return tryInitStorage();

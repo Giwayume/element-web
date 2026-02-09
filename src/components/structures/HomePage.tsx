@@ -82,6 +82,8 @@ const UserWelcomeTop: React.FC = () => {
 
             <h1>{_tDom("onboarding|welcome_user", { name: ownProfile.displayName })}</h1>
             <h2>{_tDom("onboarding|welcome_detail")}</h2>
+            <p style={{ margin: '1rem 3rem' }}>If you are using a phone, I recommend using a mobile app like <a href="https://fluffy.chat">FluffyChat</a>. This web experience is not well optimized for small screens.</p>
+            <p style={{ margin: '1rem 3rem' }}>Make sure you enter <strong>https://reeksite.com</strong> as your home server when logging in.</p>
         </div>
     );
 };

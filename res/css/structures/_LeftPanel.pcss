@@ -21,6 +21,17 @@ Please see LICENSE files in the repository root for full details.
 
     /* Contain the amount of layers rendered by constraining what actually needs re-layering via css */
     contain: layout paint;
+
+    @media screen and (max-width: 640px) {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        max-width: none;
+        transform: translateX(var(--left-panel-offset));
+        transition: transform 0.2s;
+    }
 }
 
 .mx_LeftPanel_wrapper,
@@ -40,8 +51,17 @@ Please see LICENSE files in the repository root for full details.
         overflow: hidden;
         position: relative;
 
+        @media screen and (max-width: 640px) {
+            width: 70vw !important;
+            max-width: none;
+        }
+
         &[data-collapsed] {
             max-width: var(--collapsedWidth);
+
+            @media screen and (max-width: 640px) {
+                max-width: none;
+            }
         }
     }
 }
@@ -211,6 +231,12 @@ Please see LICENSE files in the repository root for full details.
         flex-grow: 0;
         min-width: unset;
         width: unset !important;
+
+        @media screen and (max-width: 640px) {
+            flex-grow: 1;
+            max-width: none;
+            width: auto !important;
+        }
 
         .mx_LeftPanel_roomListContainer {
             width: var(--collapsedWidth);

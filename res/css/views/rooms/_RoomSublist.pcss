@@ -294,80 +294,82 @@ Please see LICENSE files in the repository root for full details.
         }
     }
 
-    &.mx_RoomSublist_minimized {
-        .mx_RoomSublist_headerContainer {
-            height: auto;
-            flex-direction: column;
-            position: relative;
+    @media screen and (min-width: 640px) {
+        &.mx_RoomSublist_minimized {
+            .mx_RoomSublist_headerContainer {
+                height: auto;
+                flex-direction: column;
+                position: relative;
 
-            .mx_RoomSublist_badgeContainer {
-                order: 0;
-                align-self: flex-end;
-                margin-right: 0;
-            }
+                .mx_RoomSublist_badgeContainer {
+                    order: 0;
+                    align-self: flex-end;
+                    margin-right: 0;
+                }
 
-            .mx_RoomSublist_stickable {
-                order: 1;
-                max-width: 100%;
-            }
+                .mx_RoomSublist_stickable {
+                    order: 1;
+                    max-width: 100%;
+                }
 
-            .mx_RoomSublist_auxButton {
-                order: 2;
-                visibility: visible;
-                width: 32px !important; /* !important to override hover styles */
-                height: 32px !important; /* !important to override hover styles */
-                margin-left: 0 !important; /* !important to override hover styles */
-                background-color: $panel-actions;
-                margin-top: 8px;
+                .mx_RoomSublist_auxButton {
+                    order: 2;
+                    visibility: visible;
+                    width: 32px !important; /* !important to override hover styles */
+                    height: 32px !important; /* !important to override hover styles */
+                    margin-left: 0 !important; /* !important to override hover styles */
+                    background-color: $panel-actions;
+                    margin-top: 8px;
 
-                &::before {
-                    top: 8px;
-                    left: 8px;
+                    &::before {
+                        top: 8px;
+                        left: 8px;
+                    }
                 }
             }
-        }
 
-        .mx_RoomSublist_resizeBox {
-            align-items: center;
-        }
-
-        .mx_RoomSublist_showNButton {
-            flex-direction: column;
-
-            .mx_RoomSublist_showNButtonChevron {
-                margin-right: 12px; /* to center */
+            .mx_RoomSublist_resizeBox {
+                align-items: center;
             }
-        }
 
-        .mx_RoomSublist_menuButton {
-            height: 16px;
-        }
+            .mx_RoomSublist_showNButton {
+                flex-direction: column;
 
-        &.mx_RoomSublist_hasMenuOpen,
-        & > .mx_RoomSublist_headerContainer:hover {
+                .mx_RoomSublist_showNButtonChevron {
+                    margin-right: 12px; /* to center */
+                }
+            }
+
             .mx_RoomSublist_menuButton {
-                visibility: visible;
-                position: absolute;
-                bottom: 48px; /* align to middle of name, 40px for aux button (with padding) and 8px for alignment */
-                right: 0;
-                width: 16px;
                 height: 16px;
-                border-radius: 0;
-                z-index: 1; /* occlude the list name */
-
-                /* This is the same color as the left panel background because it needs */
-                /* to occlude the sublist title */
-                background-color: $roomlist-bg-color;
-
-                &::before {
-                    top: 0;
-                    left: 0;
-                }
             }
 
-            &.mx_RoomSublist_headerContainer:not(.mx_RoomSublist_headerContainer_withAux) {
+            &.mx_RoomSublist_hasMenuOpen,
+            & > .mx_RoomSublist_headerContainer:hover {
                 .mx_RoomSublist_menuButton {
-                    bottom: 8px; /* align to the middle of name, 40px less than the `bottom` above. */
+                    visibility: visible;
+                    position: absolute;
+                    bottom: 48px; /* align to middle of name, 40px for aux button (with padding) and 8px for alignment */
+                    right: 0;
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 0;
+                    z-index: 1; /* occlude the list name */
+
+                    /* This is the same color as the left panel background because it needs */
+                    /* to occlude the sublist title */
+                    background-color: $roomlist-bg-color;
+
+                    &::before {
+                        top: 0;
+                        left: 0;
+                    }
+                }
+
+                &.mx_RoomSublist_headerContainer:not(.mx_RoomSublist_headerContainer_withAux) {
+                    .mx_RoomSublist_menuButton {
+                        bottom: 8px; /* align to the middle of name, 40px less than the `bottom` above. */
+                    }
                 }
             }
         }

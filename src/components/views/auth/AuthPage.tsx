@@ -64,6 +64,7 @@ export default class AuthPage extends React.PureComponent<React.PropsWithChildre
             zIndex: 1,
             background: "#14191f",
             borderRadius: "8px",
+            maxWidth: "100vw",
         };
 
         return (

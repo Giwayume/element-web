@@ -26,6 +26,7 @@ import PWAPlatform from "./platform/PWAPlatform";
 import WebPlatform from "./platform/WebPlatform";
 import { initRageshake, initRageshakeStore } from "./rageshakesetup";
 import ModuleApi from "../modules/Api.ts";
+import "../MobileMenu.ts";
 
 export const rageshakePromise = initRageshake();
 
